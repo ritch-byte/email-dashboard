@@ -18,7 +18,7 @@ function mdToPlain(text: string): string {
   return text.replace(LINK_RE, '$1 ($2)')
 }
 
-function buildPrompt(variant: { subject: string; body: string }, conversation: string, booking: string): string {
+function buildPrompt(variant: { subject: string; body: string; notes?: string }, conversation: string, booking: string): string {
   return `You personalize a fixed meeting-confirmation email template for Outsource Accelerator using the SDR's conversation with the lead.
 
 <template_subject>
@@ -36,7 +36,13 @@ ${conversation}
 <booking_details>
 ${booking || '(none provided)'}
 </booking_details>
-
+${variant.notes ? `
+<partner_context>
+${variant.notes}
+Use this as background context only — do NOT copy it into the email body.
+For example: if this says "Finance and Accounting", lean on that when describing the lead's needs.
+</partner_context>
+` : ''}
 RULES — follow all exactly:
 1. The template is the skeleton. Keep its paragraph order, fixed sentences, partner description and closing exactly as written. Do not rewrite, shorten or embellish fixed copy.
 2. The template contains markdown hyperlinks in the form [link text](url). Preserve every one character for character. Never drop, alter or rewrite a link or its text.

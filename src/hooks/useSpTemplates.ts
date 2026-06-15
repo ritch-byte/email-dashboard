@@ -29,14 +29,39 @@ function parseCSV(text: string): string[][] {
 function buildTemplates(rows: string[][]): PartnerTemplate[] {
   if (rows.length < 2) return []
   const header = rows[0][0]?.trim().toLowerCase()
-  // Detect which format the sheet uses
   return header === 'partner' ? buildNewFormat(rows) : buildOriginalSheet(rows)
 }
 
-// Original sheet columns: A=Source Partner, B=Filter/Subscription, C=Templates(doc),
-// D=Cycle, E=Type, F=Name(POC), G=POC email, H=Notes
+// Original sheet: A=Source Partner, B=Filter/Subscription, C=Doc link,
+// D=Cycle, E=Type, F=Name, G=POC email, H=Notes
 function buildOriginalSheet(rows: string[][]): PartnerTemplate[] {
-  const map = new Map<string, PartnerTemplate['variants']>()
+  // Pass 1 — build per-partner CC pool from:
+  //   a) rows where column G starts with "CC:"  (explicit CC contacts)
+  //   b) rows where column H or G contains "cc on all emails"
+  const ccPool: Record<string, string[]> = {}
+
+  for (let i = 1; i < rows.length; i++) {
+    const c = rows[i].map(s => s?.trim() ?? '')
+    if (!c[0]) continue
+    const partner = c[0].toUpperCase()
+    const pocEmailRaw = c[6] || ''
+    const sheetNotes  = c[7] || ''
+
+    const isCCPrefixed = /^cc:/i.test(pocEmailRaw)
+    const isAlwaysCC   = /cc on all emails/i.test(sheetNotes) || /cc on all emails/i.test(pocEmailRaw)
+
+    if (isCCPrefixed || isAlwaysCC) {
+      const cleaned = pocEmailRaw.replace(/^cc:\s*/i, '')
+      const m = cleaned.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/)
+      if (m) {
+        if (!ccPool[partner]) ccPool[partner] = []
+        if (!ccPool[partner].includes(m[0])) ccPool[partner].push(m[0])
+      }
+    }
+  }
+
+  // Pass 2 — build POC variants, skipping CC-only rows
+  const map   = new Map<string, PartnerTemplate['variants']>()
   const order: string[] = []
 
   for (let i = 1; i < rows.length; i++) {
@@ -44,27 +69,35 @@ function buildOriginalSheet(rows: string[][]): PartnerTemplate[] {
     const partnerRaw = c[0]
     if (!partnerRaw) continue
 
+    const pocEmailRaw = c[6] || ''
+
+    // Skip rows that are purely CC contacts (no primary POC role)
+    if (/^cc:/i.test(pocEmailRaw)) continue
+
     const partner   = partnerRaw.toUpperCase()
     const filter    = c[1] || ''
     const pocName   = c[5] || ''
-    const pocEmail  = c[6] || ''
     const sheetNote = c[7] || ''
+    const label     = pocName || 'Default'
 
-    const label = pocName || 'Default'
-
-    // Extract email address — cell sometimes has "email@x.com (extra note)"
-    const emailMatch = pocEmail.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/)
+    const emailMatch = pocEmailRaw.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/)
     const to = emailMatch ? emailMatch[0] : ''
-    const emailExtra = pocEmail.replace(to, '').replace(/^[\s,()]+|[\s,()]+$/g, '').trim()
 
-    // Merge filter + sheet notes + any parenthetical in email cell
-    const notes = [filter, sheetNote, emailExtra].filter(Boolean).join(' | ')
+    // CC = pool minus self (so Ben isn't CC'd when Ben is the TO)
+    const cc = (ccPool[partner] || []).filter(e => e !== to).join(',')
 
-    // Look up hardcoded template for subject/body — try exact match, then strip trailing digits
+    // Notes: combine filter + sheetNote + any parenthetical text from email cell
+    //        but strip the raw "cc on all emails" instruction (already encoded in CC)
+    const emailExtra = pocEmailRaw.replace(to, '').replace(/[\s,()]+$|^[\s,()]+/g, '').trim()
+    const notes = [filter, sheetNote, emailExtra]
+      .map(s => s?.trim())
+      .filter(s => s && !/cc on all emails/i.test(s))
+      .filter(Boolean)
+      .join(' | ')
+
+    // Match hardcoded template for subject/body
     const baseTpl = SP_TEMPLATES.find(t => t.partner === partner)
                  || SP_TEMPLATES.find(t => t.partner === partner.replace(/\d+$/, ''))
-
-    // Match POC variant by label similarity, else use first variant
     const existingVariant = baseTpl?.variants.find(v =>
       v.label.toLowerCase().includes(label.toLowerCase()) ||
       label.toLowerCase().includes(v.label.toLowerCase())
@@ -74,9 +107,9 @@ function buildOriginalSheet(rows: string[][]): PartnerTemplate[] {
     map.get(partner)!.push({
       label,
       to,
-      cc: existingVariant?.cc ?? '',
+      cc,
       subject: existingVariant?.subject ?? '',
-      body: existingVariant?.body ?? '',
+      body:    existingVariant?.body    ?? '',
       notes,
     })
   }
@@ -86,7 +119,7 @@ function buildOriginalSheet(rows: string[][]): PartnerTemplate[] {
 
 // New CSV format: Partner | Label | TO | CC | Subject | Body | Notes
 function buildNewFormat(rows: string[][]): PartnerTemplate[] {
-  const map = new Map<string, PartnerTemplate['variants']>()
+  const map   = new Map<string, PartnerTemplate['variants']>()
   const order: string[] = []
   for (let i = 1; i < rows.length; i++) {
     const c = rows[i].map(s => s?.trim() ?? '')
@@ -101,7 +134,7 @@ function buildNewFormat(rows: string[][]): PartnerTemplate[] {
 
 export function useSpTemplates() {
   const [templates, setTemplates] = useState<PartnerTemplate[]>(SP_TEMPLATES)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading]     = useState(true)
   const [fromSheet, setFromSheet] = useState(false)
 
   useEffect(() => {
