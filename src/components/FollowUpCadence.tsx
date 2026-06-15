@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 function boldSlots(text: string): string {
   const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  return escaped.replace(/\[([^\]]+)\]/g, '<strong style="color:#B3003C">[$1]</strong>')
+  return escaped.replace(/\[([^\]]+)\]/g, '<strong>[$1]</strong>')
 }
 
 interface Props {

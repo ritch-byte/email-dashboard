@@ -12,7 +12,7 @@ function mdToHtml(text: string): string {
     '<a href="$2" target="_blank" rel="noopener" style="color:#1a73e8;">$1</a>'
   )
   // Bold any remaining [placeholder] — unfilled merge tags left by the AI
-  const bolded = linked.replace(/\[([^\]<>]+)\]/g, '<strong style="color:#B3003C">[$1]</strong>')
+  const bolded = linked.replace(/\[([^\]<>]+)\]/g, '<strong>[$1]</strong>')
   return bolded.replace(/\n/g, '<br>')
 }
 
