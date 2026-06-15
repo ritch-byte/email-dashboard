@@ -556,6 +556,17 @@ body {
 .sp-variant-pill:hover { border-color: var(--blue-muted); background: var(--blue-soft); }
 .sp-variant-pill--active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
+.sp-notes-strip {
+  display: flex; align-items: flex-start; gap: 7px;
+  margin-top: 10px; padding: 8px 12px;
+  background: var(--blue-soft); border: 1px solid var(--blue-muted);
+  border-radius: 7px; font-size: 12px; color: var(--text-2); line-height: 1.5;
+}
+.sp-notes-icon {
+  font-style: normal; font-size: 13px; color: var(--blue);
+  flex-shrink: 0; margin-top: 1px;
+}
+
 .sp-result {
   margin-top: 14px;
   display: flex;

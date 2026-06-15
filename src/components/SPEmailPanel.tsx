@@ -192,6 +192,14 @@ export default function SPEmailPanel({ conversation, bookingPrefill, onSyncBack,
         )}
       </div>
 
+      {/* Notes / context strip */}
+      {variant.notes && (
+        <div className="sp-notes-strip">
+          <span className="sp-notes-icon">ℹ</span>
+          <span>{variant.notes}</span>
+        </div>
+      )}
+
       {/* Booking details */}
       <label className="sp-label" style={{ marginTop: 10 }}>
         Booking details <span style={{ fontWeight: 400, textTransform: 'none', fontSize: 11 }}>(optional)</span>

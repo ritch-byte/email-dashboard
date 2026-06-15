@@ -36,11 +36,11 @@ function buildTemplates(rows: string[][]): PartnerTemplate[] {
 
   for (let i = 1; i < rows.length; i++) {
     const cols = rows[i].map(s => s?.trim() ?? '')
-    const [partner, label, to, cc, subject, body] = cols
+    const [partner, label, to, cc, subject, body, notes] = cols
     if (!partner) continue
     const key = partner.toUpperCase()
     if (!map.has(key)) { map.set(key, []); order.push(key) }
-    map.get(key)!.push({ label: label || 'Default', to: to || '', cc: cc || '', subject, body })
+    map.get(key)!.push({ label: label || 'Default', to: to || '', cc: cc || '', subject, body, notes: notes || '' })
   }
 
   return order.map(key => ({ partner: key, variants: map.get(key)! }))
