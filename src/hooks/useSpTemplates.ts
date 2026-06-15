@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import type { PartnerTemplate } from '../data/spTemplates'
 import { SP_TEMPLATES } from '../data/spTemplates'
 
-const SHEET_ID = '1oH4x0auz8HyjLzJB8Joz-ybiWRk8l-wtUMKOd2sqYaA'
-const SHEET_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`
+const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRnHMFoz1T0micvk3iZ3M1BaiVOu6opJVlVDndG33ig74BlLCd2NC63YQAbv9dYnvM-nTctHRsfHPpx/pub?output=csv'
 
 function parseCSV(text: string): string[][] {
   const rows: string[][] = []
