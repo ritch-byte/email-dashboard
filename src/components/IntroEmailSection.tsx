@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import SPEmailPanel from './SPEmailPanel'
+import type { PartnerTemplate } from '../data/spTemplates'
 
 interface Props {
   leadName: string
@@ -9,9 +10,10 @@ interface Props {
   sp2BookingPrefill: string
   onSp1SyncBack?: (name: string, bookingText: string) => void
   onSp2SyncBack?: (name: string, bookingText: string) => void
+  templates?: PartnerTemplate[]
 }
 
-export default function IntroEmailSection({ leadName, rawInput, geminiResearch, sp1BookingPrefill, sp2BookingPrefill, onSp1SyncBack, onSp2SyncBack }: Props) {
+export default function IntroEmailSection({ leadName, rawInput, geminiResearch, sp1BookingPrefill, sp2BookingPrefill, onSp1SyncBack, onSp2SyncBack, templates }: Props) {
   const [conversation, setConversation] = useState(() => {
     const parts: string[] = []
     if (leadName) parts.push(`Lead name: ${leadName}`)
@@ -35,11 +37,11 @@ export default function IntroEmailSection({ leadName, rawInput, geminiResearch, 
       <div className="intro-email-cols">
         <div className="intro-email-col">
           <div className="intro-email-col-title">Source Partner 1</div>
-          <SPEmailPanel conversation={conversation} bookingPrefill={sp1BookingPrefill} onSyncBack={onSp1SyncBack} />
+          <SPEmailPanel conversation={conversation} bookingPrefill={sp1BookingPrefill} onSyncBack={onSp1SyncBack} templates={templates} />
         </div>
         <div className="intro-email-col">
           <div className="intro-email-col-title">Source Partner 2</div>
-          <SPEmailPanel conversation={conversation} bookingPrefill={sp2BookingPrefill} onSyncBack={onSp2SyncBack} />
+          <SPEmailPanel conversation={conversation} bookingPrefill={sp2BookingPrefill} onSyncBack={onSp2SyncBack} templates={templates} />
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { SP_TEMPLATES } from '../data/spTemplates'
+import type { PartnerTemplate } from '../data/spTemplates'
 
 const NETLIFY_BASE = 'https://silver-cuchufli-071209.netlify.app'
 const LINK_RE = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g
@@ -64,12 +65,15 @@ interface Props {
   conversation: string
   bookingPrefill?: string
   onSyncBack?: (partnerName: string, bookingText: string) => void
+  templates?: PartnerTemplate[]
 }
 
-export default function SPEmailPanel({ conversation, bookingPrefill, onSyncBack }: Props) {
+export default function SPEmailPanel({ conversation, bookingPrefill, onSyncBack, templates: propTemplates }: Props) {
   const isGitHubPages = window.location.hostname.includes('github.io')
   const fnUrl = (name: string) =>
     isGitHubPages ? `${NETLIFY_BASE}/.netlify/functions/${name}` : `/.netlify/functions/${name}`
+
+  const templates = propTemplates && propTemplates.length > 0 ? propTemplates : SP_TEMPLATES
 
   const [partnerIdx, setPartnerIdx] = useState(0)
   const [variantIdx, setVariantIdx] = useState(0)
@@ -80,7 +84,7 @@ export default function SPEmailPanel({ conversation, bookingPrefill, onSyncBack 
   const [copied, setCopied] = useState('')
   const [editing, setEditing] = useState(false)
 
-  const partner = SP_TEMPLATES[partnerIdx]
+  const partner = templates[Math.min(partnerIdx, templates.length - 1)]
   const variant = partner.variants[Math.min(variantIdx, partner.variants.length - 1)]
   const canGenerate = conversation.trim().length > 0 && !loading
 
@@ -164,7 +168,7 @@ export default function SPEmailPanel({ conversation, bookingPrefill, onSyncBack 
             value={partnerIdx}
             onChange={e => { setPartnerIdx(Number(e.target.value)); setVariantIdx(0); setResult(null) }}
           >
-            {SP_TEMPLATES.map((p, i) => (
+            {templates.map((p, i) => (
               <option key={p.partner} value={i}>{p.partner}</option>
             ))}
           </select>

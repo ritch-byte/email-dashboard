@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import IntroEmailSection from './components/IntroEmailSection'
 import FollowUpCadence from './components/FollowUpCadence'
+import { useSpTemplates } from './hooks/useSpTemplates'
 
 const TZ_OPTIONS = ['PHT', 'SGT', 'IST', 'AEST', 'GMT', 'EST', 'CST', 'MST', 'PST']
 
 export default function App() {
+  const { templates, loading: templatesLoading, fromSheet } = useSpTemplates()
   const [leadName, setLeadName]   = useState('')
   const [yourName, setYourName]   = useState('')
   const [sharedTz, setSharedTz]   = useState('PHT')
@@ -55,6 +57,9 @@ export default function App() {
         <div className="header-brand">
           <span className="brand-mark">OA</span>
         </div>
+        <div style={{ fontSize: 11, color: 'var(--text-3)', marginLeft: 'auto', marginRight: 12, alignSelf: 'center' }}>
+          {templatesLoading ? 'Loading templates…' : fromSheet ? '● Live from Sheet' : '● Fallback templates'}
+        </div>
         <div className="call-info">
           <input
             className="lead-name-input"
@@ -97,6 +102,7 @@ export default function App() {
           sp2BookingPrefill={sp2Prefill}
           onSp1SyncBack={handleSp1Sync}
           onSp2SyncBack={handleSp2Sync}
+          templates={templates}
         />
 
         {/* Follow Up Cadence */}
