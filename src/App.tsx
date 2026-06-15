@@ -43,9 +43,10 @@ export default function App() {
   const handleSp2Sync = (name: string, bt: string) =>
     syncBooking(name, bt, setSharedSp2, setSharedLink2, setSharedTime2, setSharedDate2)
 
-  const mkPrefill = (d: string, t: string, lk: string) =>
-    [[d, t, sharedTz].filter(Boolean).join(' '), lk ? `Meeting Link: ${lk}` : '']
-      .filter(Boolean).join('\n')
+  const mkPrefill = (d: string, t: string, lk: string) => {
+    const dateParts = [d, t, (d || t) ? sharedTz : ''].filter(Boolean)
+    return [dateParts.join(' '), lk ? `Meeting Link: ${lk}` : ''].filter(Boolean).join('\n')
+  }
 
   const sp1Prefill = mkPrefill(sharedDate, sharedTime, sharedLink)
   const sp2Prefill = mkPrefill(sharedDate2 || sharedDate, sharedTime2 || sharedTime, sharedLink2)

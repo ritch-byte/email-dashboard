@@ -11,7 +11,9 @@ function mdToHtml(text: string): string {
     /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
     '<a href="$2" target="_blank" rel="noopener" style="color:#1a73e8;">$1</a>'
   )
-  return linked.replace(/\n/g, '<br>')
+  // Bold any remaining [placeholder] — unfilled merge tags left by the AI
+  const bolded = linked.replace(/\[([^\]<>]+)\]/g, '<strong style="color:#B3003C">[$1]</strong>')
+  return bolded.replace(/\n/g, '<br>')
 }
 
 function mdToPlain(text: string): string {

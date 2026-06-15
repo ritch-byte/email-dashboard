@@ -1,5 +1,10 @@
 import { useState } from 'react'
 
+function boldSlots(text: string): string {
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  return escaped.replace(/\[([^\]]+)\]/g, '<strong style="color:#B3003C">[$1]</strong>')
+}
+
 interface Props {
   leadName: string
   yourName: string
@@ -156,7 +161,7 @@ export default function FollowUpCadence({ leadName, yourName, sp, date, time, tz
                 </button>
               </div>
             </div>
-            <pre className="cad-tpl">{step.text}</pre>
+            <pre className="cad-tpl" dangerouslySetInnerHTML={{ __html: boldSlots(step.text) }} />
           </div>
         ))}
 
@@ -184,7 +189,7 @@ export default function FollowUpCadence({ leadName, yourName, sp, date, time, tz
                     </button>
                   </div>
                 </div>
-                <pre className="cad-tpl cad-tpl--sm">{a.text}</pre>
+                <pre className="cad-tpl cad-tpl--sm" dangerouslySetInnerHTML={{ __html: boldSlots(a.text) }} />
               </div>
             ))}
           </div>
