@@ -96,15 +96,36 @@ function buildOriginalSheet(rows: string[][]): PartnerTemplate[] {
       .join(' | ')
 
     // Columns I and J — Subject and Body written directly in the sheet
-    const sheetSubject = c[8] || ''
-    const sheetBody    = c[9] || ''
+    // Decode HTML entities left over from the Drive API HTML export
+    const decodeEntities = (s: string) => s
+      .replace(/&rsquo;|&#8217;/g, "'").replace(/&lsquo;|&#8216;/g, "'")
+      .replace(/&rdquo;|&#8221;/g, '"').replace(/&ldquo;|&#8220;/g, '"')
+      .replace(/&ndash;|&#8211;/g, '-').replace(/&mdash;|&#8212;/g, '--')
+      .replace(/&amp;/g, '&').replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+
+    let rawSubject = decodeEntities(c[8] || '')
+    let rawBody    = decodeEntities(c[9] || '')
+
+    // The Drive API HTML export includes the To/Cc/Bcc/Subject table header at the top of
+    // the extracted text. If we detect that pattern, strip the header and pull the real
+    // subject + body from the content.
+    if (rawBody) {
+      // Extract subject from "Subject\n[value]" table format if column I is empty
+      if (!rawSubject) {
+        const subjectMatch = rawBody.match(/\nSubject\n([^\n]+)/) || rawBody.match(/^Subject:\s*(.+)/m)
+        if (subjectMatch) rawSubject = subjectMatch[1].trim()
+      }
+      // Trim body to start at the email greeting ("Hi ...")
+      const greetingIdx = rawBody.search(/\nHi\s+/)
+      if (greetingIdx >= 0) rawBody = rawBody.slice(greetingIdx + 1).trim()
+    }
 
     // If the sheet has subject/body, use them; otherwise fall back to SP_TEMPLATES → default skeleton
     let subject: string
     let body: string
-    if (sheetSubject && sheetBody) {
-      subject = sheetSubject
-      body    = sheetBody
+    if (rawSubject && rawBody) {
+      subject = rawSubject
+      body    = rawBody
     } else {
       const baseTpl = SP_TEMPLATES.find(t => t.partner === partner)
                    || SP_TEMPLATES.find(t => t.partner === partner.replace(/\d+$/, ''))
@@ -112,8 +133,8 @@ function buildOriginalSheet(rows: string[][]): PartnerTemplate[] {
         v.label.toLowerCase().includes(label.toLowerCase()) ||
         label.toLowerCase().includes(v.label.toLowerCase())
       ) ?? baseTpl?.variants[0] ?? buildDefaultVariant(partner)
-      subject = sheetSubject || existingVariant.subject
-      body    = sheetBody    || existingVariant.body
+      subject = rawSubject || existingVariant.subject
+      body    = rawBody    || existingVariant.body
     }
 
     if (!map.has(partner)) { map.set(partner, []); order.push(partner) }
