@@ -52,7 +52,7 @@ export default function FollowUpCadence({ leadName, yourName, sp, date, time, tz
   const LK2 = link2 || '[Meeting Link 2]'
 
   const spLine = (name: string, d: string, t: string, lk: string) =>
-    `${name} ${[d, t, TZ].filter(Boolean).join(' ')} - ${lk}`
+    `${name} ${[d, t].filter(Boolean).join(' ')} - ${lk}`
 
   const meetingList = hasSp2
     ? `${spLine(SP, D, T, LK)}\n${spLine(SP2, D2, T2, LK2)}`
