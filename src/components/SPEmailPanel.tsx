@@ -46,7 +46,7 @@ For example: if this says "Finance and Accounting", lean on that when describing
 </partner_context>
 ` : ''}
 RULES — follow all exactly:
-1. The template is the skeleton. Keep its paragraph order, fixed sentences, partner description and closing exactly as written. Do not rewrite, shorten or embellish fixed copy.
+1. The template is the skeleton. Every word that is NOT a merge tag must be copied exactly as written — character for character. This includes the partner company name, the partner description paragraph, and all closing sentences. Never rephrase, shorten, abbreviate, or alter any fixed text. If the template says "ConnectOS Talent Partners" write exactly "ConnectOS Talent Partners" — not "ConnectOS", not "Connectos", not any other variation.
 2. The template contains markdown hyperlinks in the form [link text](url). Preserve every one character for character. Never drop, alter or rewrite a link or its text.
 3. Replace every merge tag and bracket placeholder using only facts from the conversation or booking details:
    - {{ contact.firstname }} = lead's first name
