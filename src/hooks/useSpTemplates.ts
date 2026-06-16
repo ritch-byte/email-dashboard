@@ -95,21 +95,34 @@ function buildOriginalSheet(rows: string[][]): PartnerTemplate[] {
       .filter(Boolean)
       .join(' | ')
 
-    // Match hardcoded template for subject/body
-    const baseTpl = SP_TEMPLATES.find(t => t.partner === partner)
-                 || SP_TEMPLATES.find(t => t.partner === partner.replace(/\d+$/, ''))
-    const existingVariant = baseTpl?.variants.find(v =>
-      v.label.toLowerCase().includes(label.toLowerCase()) ||
-      label.toLowerCase().includes(v.label.toLowerCase())
-    ) ?? baseTpl?.variants[0] ?? buildDefaultVariant(partner)
+    // Columns I and J — Subject and Body written directly in the sheet
+    const sheetSubject = c[8] || ''
+    const sheetBody    = c[9] || ''
+
+    // If the sheet has subject/body, use them; otherwise fall back to SP_TEMPLATES → default skeleton
+    let subject: string
+    let body: string
+    if (sheetSubject && sheetBody) {
+      subject = sheetSubject
+      body    = sheetBody
+    } else {
+      const baseTpl = SP_TEMPLATES.find(t => t.partner === partner)
+                   || SP_TEMPLATES.find(t => t.partner === partner.replace(/\d+$/, ''))
+      const existingVariant = baseTpl?.variants.find(v =>
+        v.label.toLowerCase().includes(label.toLowerCase()) ||
+        label.toLowerCase().includes(v.label.toLowerCase())
+      ) ?? baseTpl?.variants[0] ?? buildDefaultVariant(partner)
+      subject = sheetSubject || existingVariant.subject
+      body    = sheetBody    || existingVariant.body
+    }
 
     if (!map.has(partner)) { map.set(partner, []); order.push(partner) }
     map.get(partner)!.push({
       label,
       to,
       cc,
-      subject: existingVariant.subject,
-      body:    existingVariant.body,
+      subject,
+      body,
       notes,
     })
   }
