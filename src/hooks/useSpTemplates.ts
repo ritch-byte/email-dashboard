@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { PartnerTemplate } from '../data/spTemplates'
-import { SP_TEMPLATES } from '../data/spTemplates'
+import { SP_TEMPLATES, buildDefaultVariant } from '../data/spTemplates'
 
 const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRnHMFoz1T0micvk3iZ3M1BaiVOu6opJVlVDndG33ig74BlLCd2NC63YQAbv9dYnvM-nTctHRsfHPpx/pub?output=csv'
 
@@ -101,15 +101,15 @@ function buildOriginalSheet(rows: string[][]): PartnerTemplate[] {
     const existingVariant = baseTpl?.variants.find(v =>
       v.label.toLowerCase().includes(label.toLowerCase()) ||
       label.toLowerCase().includes(v.label.toLowerCase())
-    ) ?? baseTpl?.variants[0]
+    ) ?? baseTpl?.variants[0] ?? buildDefaultVariant(partner)
 
     if (!map.has(partner)) { map.set(partner, []); order.push(partner) }
     map.get(partner)!.push({
       label,
       to,
       cc,
-      subject: existingVariant?.subject ?? '',
-      body:    existingVariant?.body    ?? '',
+      subject: existingVariant.subject,
+      body:    existingVariant.body,
       notes,
     })
   }

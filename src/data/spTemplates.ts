@@ -637,3 +637,37 @@ Best regards,`,
     ],
   },
 ]
+
+// Used for any SP not in the list above — keeps the standard OA email structure
+// so the AI personalises within the correct skeleton rather than generating freely.
+export function buildDefaultVariant(partnerName: string): TemplateVariant {
+  const display = partnerName
+    .split(' ')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ')
+
+  return {
+    to: '',
+    cc: '',
+    label: 'Default',
+    subject: `Meeting Confirmation: ${display} <> [Lead's First and Last name] - Date of Appointment`,
+    body: `Hi {{ contact.firstname }} and ${display} Team,
+
+I'm pleased to formally connect you both. This meeting represents a strategic opportunity, and I'm confident ${display}'s proven expertise aligns perfectly with your goals for {{ contact.quote_role_to_outsource }}.
+
+Date:
+Time:
+Meeting Location/Link:
+
+${display} Team, {{ contact.firstname }} is the [Job Title] at [Company]. They are interested in exploring strategic solutions for {{ contact.quote_role_to_outsource }}.
+
+{{ contact.firstname }}, [Brief factual description of ${display} — what they do, where they're based, key strengths].
+
+Crucial Next Step to Maximize Your Time:
+{{ contact.firstname }}, we've attached a [valuable guide to outsourcing](https://drive.google.com/file/d/1d6F-DQKVM65h3KE5CnQKJqaee-FMxUuo/view?usp=sharing) and an [outsourcing whitepaper](https://drive.google.com/file/d/1itLCO15HxDEUC8gK4FXpGQ6WmB_ZeW5b/view?usp=sharing).
+
+I will leave you to connect. Thank you and have a great week ahead!
+
+Best regards,`,
+  }
+}

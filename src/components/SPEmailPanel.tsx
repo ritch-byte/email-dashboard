@@ -57,7 +57,7 @@ RULES — follow all exactly:
 4. The sentence introducing the lead to the partner POC may be lightly extended with 1 short factual clause from the conversation (team size, timeline, pain) if clearly stated. Never invent details.
 5. Date:, Time:, Meeting Location/Link: fill from booking details if available. If not available, keep the label followed by a blank and list it in "missing".
 6. In the subject line, replace "Date of Appointment" with the actual appointment date if known, otherwise keep the placeholder and add it to "missing".
-7. Any placeholder you cannot fill: leave it visibly as [PLACEHOLDER] and add to "missing". Never guess names, titles, companies, dates or roles.
+7. Any placeholder you cannot fill: leave it visibly as [PLACEHOLDER] and add to "missing". Never guess names, titles, companies, dates or roles. Exception: if the template contains a [Brief factual description of PARTNER] placeholder, replace it with a concise 1-2 sentence factual description of that outsourcing company based on your knowledge (location, size, speciality). If you have no knowledge of the company, leave it as [SP description] and add to "missing".
 8. Style: plain, warm, professional. No hype, no pressure. Never use em dashes.
 9. Respond with ONLY a JSON object, no markdown fences, no preamble. Escape newlines as \\n:
 {"subject": "...", "body": "...", "missing": ["items SDR still needs to fill in, empty array if none"]}`
