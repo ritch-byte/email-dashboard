@@ -13,7 +13,10 @@ function mdToHtml(text: string): string {
   )
   // Bold any remaining [placeholder] — unfilled merge tags left by the AI
   const bolded = linked.replace(/\[([^\]<>]+)\]/g, '<strong>[$1]</strong>')
-  return bolded.replace(/\n/g, '<br>')
+  // Wrap each line in <p> so the preview and Gmail paste both show proper paragraph spacing
+  return bolded.split('\n').map(line =>
+    `<p style="margin:0 0 0.7em 0;font-family:inherit">${line || '&nbsp;'}</p>`
+  ).join('')
 }
 
 function mdToPlain(text: string): string {
